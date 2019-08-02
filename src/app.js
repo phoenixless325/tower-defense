@@ -19,20 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             {
                 distance: 300,
-                speed: 120
-            },
-            // {
-            //     distance: 400,
-            //     speed: 70
-            // },
-            // {
-            //     distance: 300,
-            //     speed: 600
-            // },
-            // {
-            //     distance: 300,
-            //     speed: 60
-            // }
+                speed: 150
+            }
         ]
     });
 

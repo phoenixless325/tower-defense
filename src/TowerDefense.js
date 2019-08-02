@@ -19,7 +19,7 @@ class TowerDefense {
         this._canvas = document.getElementById(canvasId);
         this._context = this._canvas.getContext('2d');
         this._context.imageSmoothingEnabled = false;
-        this._enemiesDescriptions = enemiesDescription;
+        this._enemiesDescriptions = enemiesDescription.reduce((acc, val) => acc.concat({ ...val }), []);
 
         // console.log(this.simulateGame(towerRange));
 
@@ -130,12 +130,12 @@ class TowerDefense {
 
     lose() {
         this.stop();
-        // const minRangeToWin = simulateGame(this.tower.towerRange, this._enemiesDescriptions); TODO
+        const minRangeToWin = this.simulateGame(this.tower.towerRange, this._enemiesDescriptions);
         this._gameOver = true;
         this._context.font = "50px Arial";
         this._context.fillStyle = "red";
         this._context.textAlign = "center";
-        this._context.fillText('GAME OVER!!!', this._canvasWidth / 2, this._canvasHeight / 2);
+        this._context.fillText('GAME OVER!!! ' + (!~minRangeToWin ? 'You will never win with this enemies' : (minRangeToWin === this.tower.towerRange ? 'Try Again (Depends On Random)' : 'Min Tower Range For Win: ' + minRangeToWin)), this._canvasWidth / 2, this._canvasHeight / 2);
     }
 
     startGameLoop() {
@@ -152,10 +152,9 @@ class TowerDefense {
         this._gameLoop = null;
     }
 
-    simulateGame(towerRange) {
-        let enemies = this._enemiesDescriptions.reduce((acc, val) => acc.concat({ ...val }), []).sort((a, b) => a.distance - b.distance),
+    simulateGame(towerRange, enemiesDescription) {
+        let enemies = enemiesDescription.reduce((acc, val) => acc.concat({ ...val }), []).sort((a, b) => a.distance / a.speed - b.distance / b.speed),
             maxDistance = enemies[enemies.length - 1].distance;
-        console.log('START', enemies, this._enemiesDescriptions);
         while(true) {
             for (let index in enemies)
                 if (enemies[index].distance <= towerRange) {
@@ -169,8 +168,7 @@ class TowerDefense {
             for (let index in enemies){
                 enemies[index].distance -= enemies[index].speed;
                 if(enemies[index].distance <= 0) {
-                    console.log('END', enemies);
-                    return towerRange > maxDistance ? -1 : this.simulateGame(++towerRange);
+                    return towerRange > maxDistance ? -1 : this.simulateGame(++towerRange, enemiesDescription);
                 }
             }
         }
